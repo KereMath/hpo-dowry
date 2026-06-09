@@ -1,0 +1,8 @@
+# caches and generated data (large, reproducible)
+cache/
+*.npz
+__pycache__/
+*.pyc
+
+# local benchmark data (~500 MB, cloned separately)
+yahpo_data/
