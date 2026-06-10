@@ -85,9 +85,26 @@ standard that knows the true score distribution (upper bound on achievable utili
 | `experiment_suite.py` | **Suite-level statistical verdict** across all 34 LCBench tasks (win-rate + Wilcoxon). |
 | `experiment_m1.py` | M1 ablation: cost-aware observation phase + tail hardening (`evt,k=4` vs `guarded` vs old). |
 | `bo_substrate.py` | **Phase 2-ext**: runs the stopper on top of a real **Optuna TPE (Bayesian optimization)** substrate. |
-| `PLAN.md` | The phased research & product plan, kill-criteria, milestones. |
+| `meta_stopping.py` | **M3**: meta-learned forward-looking policy (target `t*−t`), LOTO evaluation. |
+| `xie_baseline.py` | Faithful **Xie 2025 PBGI** GP-BO loop + PBGI stopping (the competitor). |
+| `decisive_m3_vs_xie.py` | Head-to-head META vs PBGI vs myopic on the GP-BO substrate. |
+| `cross_family.py`, `cross_family_m3.py` | Cross-family (rbv2) generalization; LOTO + leave-one-family-out. |
+| `rigor.py` | Friedman / Nemenyi critical-difference / pooled Wilcoxon + figures. |
+| `optuna_plugin.py` | **Product**: drop-in `EVTStopper` / `MetaStopper` callback for Optuna + demo. |
+| `PAPER.md` | Paper/thesis-style consolidation (abstract, method, theory, experiments). |
+| `PLAN.md`, `PLAN_M3.md` | Phased research/product plan and the M3 plan. |
 | `RESULTS.md` | Live results log (raw numbers). |
 | `USPexperiment.py` | The original toy script that started this line of thinking (a brute-force secretary-problem-with-threshold experiment). Kept for provenance. |
+
+**Product usage:**
+```python
+import optuna
+from optuna_plugin import EVTStopper
+study = optuna.create_study(direction="maximize")
+study.optimize(objective, n_trials=500, callbacks=[EVTStopper(frac=0.05)])  # auto-stops
+```
+Demo (`python optuna_plugin.py`, RandomForest/digits): **~85–94 % less wall-clock for ≤ 0.9 %
+accuracy lost**, the single knob `frac` tracing the quality-vs-cost operating curve.
 
 Caches (`cache/`, `landscapes.npz`) and the YAHPO data (`c:/tmp/yahpo_data`, ~500 MB) are
 *not* committed.
