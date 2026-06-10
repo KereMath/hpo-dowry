@@ -60,18 +60,22 @@ Eşit-regret eğitim-süresi tasarrufu — META vs MYOPIC (evt,k=4):
 rejimlerde META > MYOPIC (p<1e-5). **Xie 2025'in yapmadığı bağımsız katkı (onlar miyopik).**
 Kalan doğrulamalar: held-out BO izlerinde test, görülmemiş λ'ya genelleme, +rbv2 model aileleri.
 
-## Belirleyici head-to-head — GP-BO substrate, doğru GP-BO-izi baseline'ı (12 task)
+## Belirleyici head-to-head — GP-BO substrate, doğru GP-BO-izi baseline'ı (34 task)
 Eşit-regret tasarrufu, medyan (kazanma):
 | λ× | XIE (PBGI) | MYOPIC (EVT) | META (M3, LOTO) | META>XIE p |
 |---|---|---|---|---|
-| 1.0 | −12.9% (17%) | −5.5% (33%) | **+8.9% (75%)** | 3.4e-03 |
-| 2.0 | −15.1% (33%) | +0.1% (50%) | **+2.6% (75%)** | 1.6e-02 |
-| 4.0 | 0.0% (50%) | −10.0% (33%) | **+3.3% (83%)** | 5.4e-02 |
-| 8.0 | −3.2% (42%) | −1.4% (42%) | **+3.9% (83%)** | 0.19 |
-→ Doğru baseline'da PBGI ayarlı baseline'ı geçemiyor; miyopik EVT başa-baş; **sadece META tutarlı
-pozitif ve PBGI'ı geçiyor** (düşük/orta λ anlamlı). META, TPE+RS'te eğitilip GP-BO'da LOTO test —
-task VE sampler arası genelleme. (Önceki "Xie %69" şişkindi: yanlış RS-baseline artefaktı, düzeltildi.)
-Caveat: Xie re-implementasyon; n=12 yüksek-λ'da zayıf güç.
+| 1.0 | −5.6% (35%) | −7.6% (29%) | **+1.5% (53%)** | 0.125 |
+| 2.0 | −3.3% (44%) | −4.3% (38%) | **+2.0% (68%)** | 0.024 |
+| 4.0 | +0.5% (53%) | −1.0% (50%) | **+3.6% (82%)** | 0.010 |
+| 8.0 | 0.0% (50%) | −1.0% (41%) | **+4.0% (74%)** | 0.122 |
+
+**Rigor (rigor.py, 136 task×maliyet hücresi):** Friedman χ²=15.57, p=4.2e-04; ortalama sıralama
+META 1.75 < XIE 2.05 < MYOPIC 2.20, Nemenyi CD=0.284 → **META her ikisini de anlamlı geçiyor**
+(farklar 0.298, 0.452 > CD). Havuzlanmış Wilcoxon: META>XIE p=1.1e-04, META>MYOPIC p=1.8e-05.
+→ GP-BO'da büyüklük mütevazı (+0.6…+4 puan), per-cell anlamlılık orta-maliyette sağlam; **asıl büyük
+kazanç agnostik rejimde** (RS, PBGI tanımsız). META TPE+RS'te eğitilip GP-BO'da LOTO test — task VE
+sampler arası genelleme. (Önceki 12-task "%69" şişkindi: yanlış RS-baseline artefaktı, düzeltildi.)
+Figürler: figures/avg_ranks.png, figures/saving_by_cost.png. Caveat: Xie re-implementasyon.
 
 ## Açık işler (sağlamlaştırma — PhD-grade)
 - Belirleyici deneyi **34 task**'a çıkar (yüksek-λ güç); held-out BO + unseen-λ genelleme.

@@ -94,6 +94,13 @@ def main(scenario="lcbench", n_tasks=12, n_seeds=8, n_steps=60):
                 S[label][m].append(saving(np.mean(ts), np.mean(rs), bpts))
         print(f"  [{ti+1}/{len(tasks)}] {t}", flush=True)
 
+    # persist per-task savings for the rigor layer (CD diagram, significance)
+    import os
+    save_npz = {f"{r}_{m}": np.array(S[r][m]) for r in S for m in lam_mults}
+    save_npz["lam_mults"] = np.array(lam_mults)
+    save_npz["tasks"] = np.array(tasks)
+    np.savez(os.path.join("cache", f"decisive_{scenario}_{len(tasks)}t.npz"), **save_npz)
+
     print(f"\n===== DECISIVE: stopping rules on GP-BO substrate, {len(tasks)} tasks =====")
     print("matched-regret time saving % vs GP-BO-trace baseline  [median (win-rate)]")
     print(f"{'lam x':>6} | {'XIE (PBGI)':>16} | {'MYOPIC (EVT)':>16} | {'META (M3, LOTO)':>17} | {'META>XIE p':>11}")

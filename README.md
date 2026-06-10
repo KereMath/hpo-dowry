@@ -182,31 +182,39 @@ A faithful GP-BO loop with **Pandora's-Box Gittins-Index** acquisition + PBGI st
 (`xie_baseline.py`): stop when `max_x g(x) ≤ incumbent`, `g` the reservation value under the GP
 posterior. We compare three stopping rules against a **proper baseline computed on the GP-BO
 traces** (fixed-N / patience over the selection order) — `decisive_m3_vs_xie.py`. Matched-regret
-training-time saving, 12 tasks, median (win-rate):
+training-time saving, **all 34 tasks**, median (win-rate):
 
 | cost λ× | XIE (PBGI) | MYOPIC (EVT, ours) | **META (M3, LOTO)** | META>XIE (paired p) |
 |---|---|---|---|---|
-| 1.0 | −12.9 % (17 %) | −5.5 % (33 %) | **+8.9 % (75 %)** | 3.4 × 10⁻³ |
-| 2.0 | −15.1 % (33 %) | +0.1 % (50 %) | **+2.6 % (75 %)** | 1.6 × 10⁻² |
-| 4.0 | 0.0 % (50 %) | −10.0 % (33 %) | **+3.3 % (83 %)** | 5.4 × 10⁻² |
-| 8.0 | −3.2 % (42 %) | −1.4 % (42 %) | **+3.9 % (83 %)** | 0.19 (n.s.) |
+| 1.0 | −5.6 % (35 %) | −7.6 % (29 %) | **+1.5 % (53 %)** | 0.125 (n.s.) |
+| 2.0 | −3.3 % (44 %) | −4.3 % (38 %) | **+2.0 % (68 %)** | 0.024 |
+| 4.0 | +0.5 % (53 %) | −1.0 % (50 %) | **+3.6 % (82 %)** | 0.010 |
+| 8.0 | 0.0 % (50 %) | −1.0 % (41 %) | **+4.0 % (74 %)** | 0.122 (n.s.) |
 
-**Honest verdict.** Against a *properly-tuned* baseline on the GP-BO traces, **PBGI does not beat
-the tuned baseline** (it goes negative at low cost) and **our myopic EVT rule is roughly
-break-even**. **Only the forward-looking META policy consistently saves time**, and it **beats PBGI**
-significantly at low/medium cost (p ≤ 0.016), with a positive but non-significant trend at high cost
-(n = 12). Critically, META was trained on random-search + TPE traces and tested **leave-one-task-out
-on GP-BO traces** — it generalizes across *both* tasks and samplers.
+**Aggregate rigor** (`rigor.py`, 136 task×cost cells): Friedman χ²=15.57, **p=4.2×10⁻⁴**;
+average ranks (1=best) **META 1.75** < XIE 2.05 < MYOPIC 2.20, with Nemenyi **CD=0.284** —
+both gaps (META–XIE 0.298, META–MYOPIC 0.452) exceed CD, so **META significantly outranks both**.
+Pooled paired Wilcoxon: META > XIE **p=1.1×10⁻⁴**, META > MYOPIC **p=1.8×10⁻⁵**.
+(Figures: `figures/avg_ranks.png`, `figures/saving_by_cost.png`.)
 
-> An earlier version of this table used a random-search baseline and reported inflated 60–69 %
-> savings; that was a methodological artifact and has been replaced by the correctly-baselined
+**Honest verdict.** Against a *properly-tuned* GP-BO-trace baseline, PBGI and our myopic EVT rule
+are both roughly break-even (PBGI even negative at low cost); **only the forward-looking META policy
+is consistently positive, and it significantly out-ranks both PBGI and the myopic rule** on the
+GP-BO substrate (Friedman + Nemenyi + pooled Wilcoxon). Per-cost magnitudes are **modest**
+(median +0.6 to +4 pp) and per-cell significance holds firmly only in the mid-cost regime; the
+**large** wins remain in the optimizer-agnostic regime (random search, §5.5: +15–33 % vs myopic,
+where PBGI is undefined). META was trained on random-search + TPE traces and tested
+**leave-one-task-out on GP-BO traces** — generalizing across *both* tasks and samplers.
+
+> An earlier 12-task version of this table used a random-search baseline and reported inflated
+> 60–69 % savings; that was a methodological artifact, replaced by the correctly-baselined 34-task
 > numbers above.
 
 **Caveats (kept explicit):** the PBGI baseline is our faithful *re-implementation*, not the
-authors' code; n = 12 tasks makes the high-cost regime under-powered; magnitudes are modest. The
-robust, defensible claim is: *a meta-learned forward-looking stopping policy is competitive with /
-beats the myopic PBGI rule on its own GP-BO substrate, and additionally runs on optimizer settings
-(random search, TPE) where PBGI is undefined.*
+authors' code; GP-BO magnitudes are modest; the strongest evidence is the rank-aggregate, not any
+single cost cell. Robust claim: *a meta-learned forward-looking stopping policy significantly
+out-ranks the myopic PBGI rule on its own GP-BO substrate and beats the myopic EVT rule by 15–33 %
+on optimizer settings where PBGI is undefined.*
 
 ---
 
