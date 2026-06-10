@@ -60,7 +60,22 @@ Eşit-regret eğitim-süresi tasarrufu — META vs MYOPIC (evt,k=4):
 rejimlerde META > MYOPIC (p<1e-5). **Xie 2025'in yapmadığı bağımsız katkı (onlar miyopik).**
 Kalan doğrulamalar: held-out BO izlerinde test, görülmemiş λ'ya genelleme, +rbv2 model aileleri.
 
-## Açık işler
-- Xie 2025 PBGI durdurma head-to-head (GP-BO substrate) — koşuyor.
-- M3 sağlamlaştırma: held-out BO, unseen-λ, daha çok benchmark; (ops.) RL/GRU ardışık politika.
+## Belirleyici head-to-head — GP-BO substrate, doğru GP-BO-izi baseline'ı (12 task)
+Eşit-regret tasarrufu, medyan (kazanma):
+| λ× | XIE (PBGI) | MYOPIC (EVT) | META (M3, LOTO) | META>XIE p |
+|---|---|---|---|---|
+| 1.0 | −12.9% (17%) | −5.5% (33%) | **+8.9% (75%)** | 3.4e-03 |
+| 2.0 | −15.1% (33%) | +0.1% (50%) | **+2.6% (75%)** | 1.6e-02 |
+| 4.0 | 0.0% (50%) | −10.0% (33%) | **+3.3% (83%)** | 5.4e-02 |
+| 8.0 | −3.2% (42%) | −1.4% (42%) | **+3.9% (83%)** | 0.19 |
+→ Doğru baseline'da PBGI ayarlı baseline'ı geçemiyor; miyopik EVT başa-baş; **sadece META tutarlı
+pozitif ve PBGI'ı geçiyor** (düşük/orta λ anlamlı). META, TPE+RS'te eğitilip GP-BO'da LOTO test —
+task VE sampler arası genelleme. (Önceki "Xie %69" şişkindi: yanlış RS-baseline artefaktı, düzeltildi.)
+Caveat: Xie re-implementasyon; n=12 yüksek-λ'da zayıf güç.
+
+## Açık işler (sağlamlaştırma — PhD-grade)
+- Belirleyici deneyi **34 task**'a çıkar (yüksek-λ güç); held-out BO + unseen-λ genelleme.
+- Anytime regret-vs-cost AUC, critical-difference (Nemenyi) diyagramı, çok-seed hata çubukları.
+- +rbv2 model aileleri (SVM/RF/XGBoost) — cross-family genelleme.
+- M3 stretch: RL/GRU ardışık politika; teori (META'nın oracle'a regret sınırı).
 - (ops.) Hyperband/ASHA substrate; ürün: Optuna/Ray-Tune stopper eklentisi.

@@ -177,26 +177,36 @@ MYOPIC at every cost level (p < 10⁻⁵), on held-out tasks. **This forward-loo
 what Xie 2025 (myopic) does not have**, and is the thesis's primary own contribution. (Remaining
 hardening: held-out BO traces, generalization to unseen λ, more model families.)
 
-### 5.6 Head-to-head vs. the competitor (Xie 2025 PBGI), on a GP-BO substrate
+### 5.6 Decisive head-to-head vs. the competitor (Xie 2025 PBGI), GP-BO substrate
 A faithful GP-BO loop with **Pandora's-Box Gittins-Index** acquisition + PBGI stopping
-(`xie_baseline.py`): stop when `max_x g(x) ≤ incumbent`, with `g` the reservation value under the
-GP posterior. Matched-regret saving on the GP-BO substrate (12 tasks):
+(`xie_baseline.py`): stop when `max_x g(x) ≤ incumbent`, `g` the reservation value under the GP
+posterior. We compare three stopping rules against a **proper baseline computed on the GP-BO
+traces** (fixed-N / patience over the selection order) — `decisive_m3_vs_xie.py`. Matched-regret
+training-time saving, 12 tasks, median (win-rate):
 
-| cost λ× | OURS (EVT, agnostic) | XIE (PBGI, GP-only) |
-|---|---|---|
-| 1.0 | 62 % | **69 %** |
-| 2.0 | 56 % | 58 % |
-| 4.0 | 17 % | **43 %** |
-| 8.0 | 27 % | 25 % (n.s., p=0.90) |
+| cost λ× | XIE (PBGI) | MYOPIC (EVT, ours) | **META (M3, LOTO)** | META>XIE (paired p) |
+|---|---|---|---|---|
+| 1.0 | −12.9 % (17 %) | −5.5 % (33 %) | **+8.9 % (75 %)** | 3.4 × 10⁻³ |
+| 2.0 | −15.1 % (33 %) | +0.1 % (50 %) | **+2.6 % (75 %)** | 1.6 × 10⁻² |
+| 4.0 | 0.0 % (50 %) | −10.0 % (33 %) | **+3.3 % (83 %)** | 5.4 × 10⁻² |
+| 8.0 | −3.2 % (42 %) | −1.4 % (42 %) | **+3.9 % (83 %)** | 0.19 (n.s.) |
 
-**Honest verdict:** *where a GP surrogate exists, PBGI ≥ our myopic EVT rule* — it uses sharper
-per-candidate posterior information. We do **not** beat Xie on their home turf with the myopic
-rule. Our value is (i) **optimizer-agnosticism** — on random search / TPE the PBGI rule cannot be
-computed at all (no posterior), ours runs unchanged; and (ii) the **forward-looking M3 policy**, a
-different axis. *(Caveat: the matched-regret baseline here is computed on random-search orderings,
-so the absolute saving magnitudes are inflated; the OURS-vs-XIE relative ordering is the
-trustworthy part. The decisive open experiment is M3-forward-looking vs. PBGI on the GP-BO substrate
-with a GP-BO-trace baseline.)*
+**Honest verdict.** Against a *properly-tuned* baseline on the GP-BO traces, **PBGI does not beat
+the tuned baseline** (it goes negative at low cost) and **our myopic EVT rule is roughly
+break-even**. **Only the forward-looking META policy consistently saves time**, and it **beats PBGI**
+significantly at low/medium cost (p ≤ 0.016), with a positive but non-significant trend at high cost
+(n = 12). Critically, META was trained on random-search + TPE traces and tested **leave-one-task-out
+on GP-BO traces** — it generalizes across *both* tasks and samplers.
+
+> An earlier version of this table used a random-search baseline and reported inflated 60–69 %
+> savings; that was a methodological artifact and has been replaced by the correctly-baselined
+> numbers above.
+
+**Caveats (kept explicit):** the PBGI baseline is our faithful *re-implementation*, not the
+authors' code; n = 12 tasks makes the high-cost regime under-powered; magnitudes are modest. The
+robust, defensible claim is: *a meta-learned forward-looking stopping policy is competitive with /
+beats the myopic PBGI rule on its own GP-BO substrate, and additionally runs on optimizer settings
+(random search, TPE) where PBGI is undefined.*
 
 ---
 
@@ -239,10 +249,12 @@ art**, and one very recent paper overlaps heavily:
 
 - **"New optimizer that beats SOTA":** not the goal, and not realistic — a stopping layer
   does not choose configs; BO + multi-fidelity own that axis.
-- **"Beat the just-published cost-aware stopping SOTA (Xie 2025) head-to-head":** hard; we
-  would be a variant. Possible only by winning in regimes where GP/PBGI assumptions fail
-  (random search, non-GP samplers, heavy-tailed improvement distributions) — which is exactly
-  the optimizer-agnostic + EVT niche.
+- **"Beat the just-published cost-aware stopping SOTA (Xie 2025) head-to-head":** the *myopic*
+  EVT rule does **not** beat PBGI on its GP-BO turf. But the **forward-looking META policy
+  does** — modestly and significantly at low/medium cost on the GP-BO substrate (§5.6), while
+  also running where PBGI is undefined (random search, TPE). This is the strongest card: a
+  *different axis* (learned, forward-looking) rather than a variant of the same myopic rule.
+  Still to harden: all 34 tasks for high-cost power, more benchmarks, and the authors' own code.
 - **Master's thesis:** **viable and well-supported** — strong, significant, reproducible
   empirical results on real benchmarks across two substrates, a clean method, documented
   negatives, and a narrow-but-real novelty, *provided* we (a) engage Xie 2025 directly as
