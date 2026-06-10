@@ -15,6 +15,29 @@ how the work proceeds toward a thesis and/or a product.
 
 ---
 
+## ⚠️ Status & open work (required to reach a top-tier venue)
+
+Current standing: **complete master's-thesis / workshop-grade** work (working method, honest
+negative, a meta-learned policy that generalizes and out-ranks the PBGI competitor, theory,
+product, live validation). It is **not** yet a NeurIPS/ICML main-conference paper. The four
+things that must still be done — see [`ROADMAP_TOPVENUE.md`](ROADMAP_TOPVENUE.md) for the full plan:
+
+- [ ] **1. Beat the real competitor.** Run **Xie et al. (2025)'s released PBGI/LogEIPC code** head-to-head
+      on **standard benchmarks (HPOBench, PD1, real deep-learning HPO)** — not our re-implementation.
+- [ ] **2. Strong baselines.** Compare against **ASHA / Hyperband (multi-fidelity) + BO + learned
+      learning-curve early stopping**, not just fixed-budget / patience.
+- [ ] **3. Stronger policy + real theory.** A **sequential / RL** stopping policy (beyond one-shot
+      regression), and the **concentration step of Prop. 4** (held-out error → uniform δ w.h.p., a real
+      generalization theorem).
+- [ ] **4. Live-training at scale.** Validate on **real (non-surrogate) deep-learning training**, beyond
+      the small sklearn demo.
+
+These are PhD-scale workstreams; this repo is their de-risked foundation.
+
+---
+
+---
+
 ## 1. Motivation
 
 A sequential HPO run evaluates configurations one at a time; each evaluation costs real
