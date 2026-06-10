@@ -89,7 +89,19 @@ Figürler: figures/avg_ranks.png, figures/saving_by_cost.png. Caveat: Xie re-imp
 aile-bağımlı ezber yok, gerçek transfer. **Miyopik başarısızlığı, öğrenilmiş yaklaşımın gerekçesi
 oluyor; META merkezi katkı.**
 
-## Açık işler (sağlamlaştırma — PhD-grade)
+## Unseen-λ genelleme (hem task hem maliyet held-out, cross-family) — genelleme üçlemesi tamam
+| test | test λ | META | MYOPIC | p |
+|---|---|---|---|---|
+| yüksek-maliyete extrap. (eğit {1,2}) | 4.0/8.0 | +23.6%/+29.3% | −1.3%/+6.1% | 6.5e-09/9.2e-07 |
+| düşük-maliyete extrap. (eğit {4,8}) | 1.0/2.0 | +23.6%/+27.3% | −5.5%/−3.4% | 2.8e-10/1.3e-09 |
+→ META görülmemiş maliyet seviyelerine + görülmemiş task'lara aynı anda genelliyor (+23–29%, p<1e-6).
+**Genelleme üçlemesi: task (LOTO) ✓ · model ailesi (LOFO) ✓ · maliyet (unseen-λ) ✓.**
+
+## Artifaktlar
+PAPER.md (paper/tez taslağı + teori), optuna_plugin.py (ürün: ~%90 wall-clock tasarrufu, <%1 kayıp),
+rigor.py (Friedman/Nemenyi/figürler), unseen_lambda.py. Repo: github.com/KereMath/hpo-dowry.
+
+## Açık işler (kalan — opsiyonel)
 - Belirleyici deneyi **34 task**'a çıkar (yüksek-λ güç); held-out BO + unseen-λ genelleme.
 - Anytime regret-vs-cost AUC, critical-difference (Nemenyi) diyagramı, çok-seed hata çubukları.
 - +rbv2 model aileleri (SVM/RF/XGBoost) — cross-family genelleme.

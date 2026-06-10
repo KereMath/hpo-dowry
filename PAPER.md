@@ -139,6 +139,16 @@ CD=0.284 (both gaps significant); pooled META>XIE p=1.1×10⁻⁴, META>MYOPIC p
 XGBoost/SVM). META rescues it: leave-one-task-out +19.7/+23.8/+27.3/+31.0 %, and **leave-one-family-
 out** (unseen family) +16.9/+21.1/+27.3/+30.4 %, vs. myopic ≤ +6.1 %; p < 10⁻⁶ throughout.
 
+**5.6 Unseen-cost generalization.** Training on a subset of cost levels and deploying on held-out
+ones (simultaneously leave-one-task-out), META extrapolates to **higher** unseen cost
+(+23.6/+29.3 %) and **lower** unseen cost (+23.6/+27.3 %), vs. myopic ≤ +6.1 %; p < 10⁻⁶. So a single
+policy adapts across cost regimes it never saw. **Generalization triad — across tasks, model
+families, and cost levels — all hold.**
+
+**5.7 Product.** An Optuna `EVTStopper` drop-in callback (`optuna_plugin.py`) auto-terminates a
+study; on RandomForest/digits it saves ~85–94 % wall-clock for ≤ 0.9 % accuracy, the single knob
+`frac` tracing the quality-vs-cost curve.
+
 ## 6. Limitations
 
 - On the GP-BO substrate the absolute savings of all rules are modest; META's win is significant in
