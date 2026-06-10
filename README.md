@@ -218,6 +218,28 @@ on optimizer settings where PBGI is undefined.*
 
 ---
 
+### 5.7 Cross-family generalization — the myopic rule fails, the learned policy rescues it
+We rebuilt landscapes on three **classic-ML families** from `rbv2_*` (XGBoost, SVM, Random Forest;
+12 tasks each, real `timetrain` cost) — `cross_family.py`, `cross_family_m3.py`.
+
+**The fixed myopic EVT rule does NOT transfer beyond LCBench MLPs.** Matched-regret saving is
+positive on Random Forest but **negative on XGBoost and SVM** (e.g. −24 % / −22 % at low cost),
+overall break-even-to-negative. An honest, scope-defining limitation: the fixed rule is
+landscape/family-dependent.
+
+**The meta-learned forward-looking policy (META) rescues generalization** — even to an entirely
+unseen *family*:
+
+| | cost λ× | META | MYOPIC | META > MYOPIC p |
+|---|---|---|---|---|
+| **leave-one-task-out** | 1.0 / 4.0 / 8.0 | +19.7 % / +27.3 % / +31.0 % | −5.5 % / −1.3 % / +6.1 % | 5.4×10⁻⁸ … 6.5×10⁻⁹ |
+| **leave-one-FAMILY-out** | 1.0 / 4.0 / 8.0 | +16.9 % / +27.3 % / +30.4 % | (same myopic) | 6.3×10⁻¹⁰ … 2.0×10⁻⁹ |
+
+Trained on two families, deployed on the held-out third (**LOFO**), META still saves **17–31 %** at
+matched quality (p < 10⁻⁶ at every cost), ≈ its leave-one-task-out performance — so it transfers
+across *model families*, not just tasks. **This turns the myopic rule's failure into the motivation
+for the learned approach, and makes META the central contribution.**
+
 ## 6. Where this sits in the literature (honest novelty assessment)
 
 A verified multi-source literature review (21 primary sources, 25 adversarially-checked
@@ -263,11 +285,15 @@ art**, and one very recent paper overlaps heavily:
   also running where PBGI is undefined (random search, TPE). This is the strongest card: a
   *different axis* (learned, forward-looking) rather than a variant of the same myopic rule.
   Still to harden: all 34 tasks for high-cost power, more benchmarks, and the authors' own code.
-- **Master's thesis:** **viable and well-supported** — strong, significant, reproducible
-  empirical results on real benchmarks across two substrates, a clean method, documented
-  negatives, and a narrow-but-real novelty, *provided* we (a) engage Xie 2025 directly as
-  related work and a baseline, and (b) add the forward-looking M3 angle as the independent
-  contribution.
+- **Master's thesis:** **viable and well-supported, with a clear central result.** The arc is:
+  (i) a parameter-free cost-aware EVT stopping rule that works and is optimizer-agnostic, but
+  (ii) is *benchmark/family-dependent* (fails to transfer from LCBench MLPs to XGBoost/SVM) —
+  which (iii) motivates the **meta-learned forward-looking policy (META)**, the central
+  contribution, which **transfers across tasks and across model families (leave-one-family-out,
+  +17–31 % vs the myopic rule, p < 10⁻⁶)** and **significantly out-ranks the competitor's PBGI
+  rule on its own GP-BO substrate** (Friedman p = 4×10⁻⁴). This is a self-contained, honest,
+  publishable-grade story (workshop → possibly main conference), with documented negatives and a
+  competitor baseline engaged head-on.
 - **Product:** a drop-in, optimizer-agnostic, zero-tuning **stopper plugin** (Optuna
   `StudyStopper` / Ray Tune `Stopper`) that cuts cloud training cost — a credible OSS artifact
   regardless of the publication outcome.

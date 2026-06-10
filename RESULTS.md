@@ -77,6 +77,18 @@ kazanç agnostik rejimde** (RS, PBGI tanımsız). META TPE+RS'te eğitilip GP-BO
 sampler arası genelleme. (Önceki 12-task "%69" şişkindi: yanlış RS-baseline artefaktı, düzeltildi.)
 Figürler: figures/avg_ranks.png, figures/saving_by_cost.png. Caveat: Xie re-implementasyon.
 
+## Cross-family genelleme (rbv2: XGBoost/SVM/RandomForest, 12'şer task) — MERKEZİ SONUÇ
+**Sabit miyopik EVT kuralı ailelere genellemiyor:** RandomForest pozitif, ama XGBoost/SVM negatif
+(−24%/−22% düşük maliyette), genel başa-baş/negatif. Kapsam-tanımlayan dürüst limitasyon.
+**Ama META (öğrenilmiş, ileriye-bakan) genellemeyi kurtarıyor:**
+| test | λ× | META | MYOPIC | p |
+|---|---|---|---|---|
+| LOTO | 1.0/4.0/8.0 | +19.7%/+27.3%/+31.0% | −5.5%/−1.3%/+6.1% | 5e-8…6e-9 |
+| LOFO (görülmemiş aile) | 1.0/4.0/8.0 | +16.9%/+27.3%/+30.4% | (aynı) | 6e-10…2e-9 |
+→ İki ailede eğitilip 3. ailede test edildiğinde bile META %17–31 tasarruf (p<1e-6); LOFO≈LOTO →
+aile-bağımlı ezber yok, gerçek transfer. **Miyopik başarısızlığı, öğrenilmiş yaklaşımın gerekçesi
+oluyor; META merkezi katkı.**
+
 ## Açık işler (sağlamlaştırma — PhD-grade)
 - Belirleyici deneyi **34 task**'a çıkar (yüksek-λ güç); held-out BO + unseen-λ genelleme.
 - Anytime regret-vs-cost AUC, critical-difference (Nemenyi) diyagramı, çok-seed hata çubukları.
