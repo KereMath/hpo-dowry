@@ -157,6 +157,47 @@ incumbent plateaus early → the stopper exploits the plateau):
 **Takeaway:** the layer is robust to the dominant real optimizer — closing the single most
 important reviewer objection ("does it work on real BO, not just random search?").
 
+### 5.5 M3 — meta-learned forward-looking stopping (the independent contribution)
+The myopic one-step rule (and Xie 2025) leave value on the table in the *low-cost* regime. M3
+trains a policy to imitate the **hindsight-optimal** stop (regression target `t* − t`,
+"steps-to-optimum"; stop when predicted `≤ 0`), on a 523k-row meta-dataset built from random
+-search *and* BO traces across the 34 tasks and 5 cost levels. Evaluated **leave-one-task-out**
+(generalizing to *unseen* tasks). Matched-regret time saving — META vs. the MYOPIC `evt,k=4` rule:
+
+| cost λ× | META (forward-looking) | MYOPIC | paired Wilcoxon p |
+|---|---|---|---|
+| 0.5 | **+14.6 %** (94 % win) | −11.0 % (24 %) | 1.6 × 10⁻⁹ |
+| 1.0 | **+17.8 %** (97 %) | −0.8 % (41 %) | 1.7 × 10⁻⁷ |
+| 2.0 | **+23.6 %** (97 %) | +1.8 % (56 %) | 9.0 × 10⁻⁶ |
+| 4.0 | **+32.2 %** (100 %) | +11.2 % (76 %) | 6.4 × 10⁻⁹ |
+| 8.0 | **+33.1 %** (100 %) | +27.0 % (76 %) | 5.8 × 10⁻¹⁰ |
+
+The low-cost regime where the myopic rule *lost* (−11 %, −0.8 %) becomes a strong win; META beats
+MYOPIC at every cost level (p < 10⁻⁵), on held-out tasks. **This forward-looking axis is exactly
+what Xie 2025 (myopic) does not have**, and is the thesis's primary own contribution. (Remaining
+hardening: held-out BO traces, generalization to unseen λ, more model families.)
+
+### 5.6 Head-to-head vs. the competitor (Xie 2025 PBGI), on a GP-BO substrate
+A faithful GP-BO loop with **Pandora's-Box Gittins-Index** acquisition + PBGI stopping
+(`xie_baseline.py`): stop when `max_x g(x) ≤ incumbent`, with `g` the reservation value under the
+GP posterior. Matched-regret saving on the GP-BO substrate (12 tasks):
+
+| cost λ× | OURS (EVT, agnostic) | XIE (PBGI, GP-only) |
+|---|---|---|
+| 1.0 | 62 % | **69 %** |
+| 2.0 | 56 % | 58 % |
+| 4.0 | 17 % | **43 %** |
+| 8.0 | 27 % | 25 % (n.s., p=0.90) |
+
+**Honest verdict:** *where a GP surrogate exists, PBGI ≥ our myopic EVT rule* — it uses sharper
+per-candidate posterior information. We do **not** beat Xie on their home turf with the myopic
+rule. Our value is (i) **optimizer-agnosticism** — on random search / TPE the PBGI rule cannot be
+computed at all (no posterior), ours runs unchanged; and (ii) the **forward-looking M3 policy**, a
+different axis. *(Caveat: the matched-regret baseline here is computed on random-search orderings,
+so the absolute saving magnitudes are inflated; the OURS-vs-XIE relative ordering is the
+trustworthy part. The decisive open experiment is M3-forward-looking vs. PBGI on the GP-BO substrate
+with a GP-BO-trace baseline.)*
+
 ---
 
 ## 6. Where this sits in the literature (honest novelty assessment)

@@ -15,7 +15,7 @@ import os
 
 import numpy as np
 from scipy import stats as sstats
-from sklearn.ensemble import HistGradientBoostingClassifier
+from sklearn.ensemble import HistGradientBoostingRegressor
 
 from benchmark import get_suite
 from bo_substrate import get_bo_suite
@@ -61,18 +61,23 @@ def _optimal_stop(scores, sucosts):
 
 
 def _trace_rows(scores, sucosts):
-    """Emit (feature, label) rows for decision steps k_min..min(T,STEP_CAP)."""
+    """Emit (feature, label) rows for decision steps k_min..min(T,STEP_CAP).
+
+    Regression target = (t* - t): signed #steps to the hindsight-optimal stop.
+    Positive => keep going; <= 0 => at/past the optimum (stop). This avoids the
+    severe class imbalance of a >=t* binary label and is genuinely
+    forward-looking (it predicts how far the optimum still is)."""
     T = min(len(scores), STEP_CAP)
     tstar = _optimal_stop(scores[:T], sucosts[:T])
     X, y = [], []
     for t in range(K_MIN, T):
         X.append(step_features(scores[:t], sucosts[:t]))
-        y.append(1 if t >= tstar else 0)
+        y.append(float(tstar - t))
     return X, y
 
 
 def build_meta_dataset(scenario="lcbench", n_rs=40, seed=0):
-    cache = os.path.join(CACHE_DIR, f"meta_{scenario}_rs{n_rs}.npz")
+    cache = os.path.join(CACHE_DIR, f"meta_{scenario}_rs{n_rs}_reg.npz")
     if os.path.exists(cache):
         d = np.load(cache, allow_pickle=True)
         return d["X"], d["y"], d["groups"]
@@ -119,7 +124,8 @@ class MetaStopping(StoppingRule):
         if n < self.k_min:
             return False
         f = step_features(np.array(self.scores), np.array(self.costs))
-        return int(self.model.predict(f.reshape(1, -1))[0]) == 1
+        # predicted steps-to-optimum <= 0  => stop
+        return float(self.model.predict(f.reshape(1, -1))[0]) <= 0.0
 
 
 def loto_evaluate(scenario="lcbench"):
@@ -127,7 +133,8 @@ def loto_evaluate(scenario="lcbench"):
     land = get_suite(scenario, M=400, seed=0)
     tasks = list(land.keys())
     print(f"\nmeta-dataset: {len(y)} rows, {X.shape[1]} features, "
-          f"positive rate={y.mean():.3f}")
+          f"target (t*-t): mean={y.mean():.2f} median={np.median(y):.2f} "
+          f"frac<=0={np.mean(y<=0):.3f}")
 
     # Leave-one-task-out: train on all other tasks, evaluate the learned policy
     # on the held-out task by actually running it (random-search orderings).
@@ -136,8 +143,8 @@ def loto_evaluate(scenario="lcbench"):
     from core import MarginalStopping
     for gi, t in enumerate(tasks):
         mask = groups != gi
-        clf = HistGradientBoostingClassifier(
-            max_depth=4, max_iter=150, learning_rate=0.08, l2_regularization=1.0)
+        clf = HistGradientBoostingRegressor(
+            max_depth=4, max_iter=200, learning_rate=0.08, l2_regularization=1.0)
         clf.fit(X[mask], y[mask])
 
         s, c = land[t]
@@ -146,9 +153,9 @@ def loto_evaluate(scenario="lcbench"):
         for m in LAM_MULTS:
             lam = base_lam * m
             bpts = baseline_points(s, c, lam)
-            # held-out task: run META policy and MYOPIC rule
-            mt, mr = eval_rule(s, c, lambda: MetaStopping(clf), lam)
-            yt, yr = eval_rule(s, c, lambda: MarginalStopping("evt", k_min=4), lam)
+            # held-out task: run META policy and MYOPIC rule (eval_rule -> time,regret,util)
+            mt, mr, _ = eval_rule(s, c, lambda: MetaStopping(clf), lam)
+            yt, yr, _ = eval_rule(s, c, lambda: MarginalStopping("evt", k_min=4), lam)
             for (rt, rr), store in [((mt, mr), save_meta), ((yt, yr), save_myopic)]:
                 bt = time_at_regret(bpts, rr)
                 if np.isfinite(bt) and bt > 0:

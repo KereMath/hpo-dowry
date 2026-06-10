@@ -45,7 +45,22 @@ Eşit-regret eğitim-süresi tasarrufu (stopper evt,k=4 vs hindsight baseline):
 → Katman gerçek dominant optimizer'ın üstünde de çalışıyor; yüksek maliyette random search'ten
 daha büyük tasarruf (BO erken platoluyor, stopper platoyu yakalıyor). En kritik reviewer-itirazı kapandı.
 
+## M3 — Meta-öğrenilmiş ileriye-bakan durdurma (LOTO, görülmemiş task'a genelliyor)
+Regresyon hedefi = `t* − t` (optimal durmaya kalan adım); "tahmin ≤ 0 → dur". 523,600 satırlık
+meta-veri (34 task × RS+BO izleri × 5 λ). **Leave-one-task-out** değerlendirme (sızıntısız).
+Eşit-regret eğitim-süresi tasarrufu — META vs MYOPIC (evt,k=4):
+| λ× | META | MYOPIC | eşli Wilcoxon p |
+|---|---|---|---|
+| 0.5 | **+14.6%** (w94%) | −11.0% (w24%) | 1.6e-09 |
+| 1.0 | **+17.8%** (w97%) | −0.8% (w41%) | 1.7e-07 |
+| 2.0 | **+23.6%** (w97%) | +1.8% (w56%) | 9.0e-06 |
+| 4.0 | **+32.2%** (w100%) | +11.2% (w76%) | 6.4e-09 |
+| 8.0 | **+33.1%** (w100%) | +27.0% (w76%) | 5.8e-10 |
+→ Miyopik kuralın kaybettiği düşük-maliyet köşesi (−11%, −0.8%) **güçlü kazanca** döndü; tüm
+rejimlerde META > MYOPIC (p<1e-5). **Xie 2025'in yapmadığı bağımsız katkı (onlar miyopik).**
+Kalan doğrulamalar: held-out BO izlerinde test, görülmemiş λ'ya genelleme, +rbv2 model aileleri.
+
 ## Açık işler
-- Literatür taraması (novelty + related work; Makarova 2022 vd.) — koşuyor.
-- M3: meta-öğrenilmiş ileriye-bakan durdurma (hindsight+USP), düşük-maliyet miyopik açığı için.
+- Xie 2025 PBGI durdurma head-to-head (GP-BO substrate) — koşuyor.
+- M3 sağlamlaştırma: held-out BO, unseen-λ, daha çok benchmark; (ops.) RL/GRU ardışık politika.
 - (ops.) Hyperband/ASHA substrate; ürün: Optuna/Ray-Tune stopper eklentisi.
