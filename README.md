@@ -34,6 +34,24 @@ things that must still be done — see [`ROADMAP_TOPVENUE.md`](ROADMAP_TOPVENUE.
 
 These are PhD-scale workstreams; this repo is their de-risked foundation.
 
+### Honest competitive standing (what we beat, what we didn't)
+
+- **vs fixed-budget / patience (common defaults):** clearly ahead — 5–27 % time saved at matched
+  quality, p < 10⁻⁶. *(But these are weak baselines.)*
+- **vs Xie 2025 PBGI (the SOTA cost-aware stopping rule):** our *myopic* rule does **not** beat PBGI
+  on its GP-BO turf; our *META* policy **out-ranks** PBGI significantly in aggregate rank (Friedman
+  p = 4×10⁻⁴, Nemenyi-significant) but by a **modest** per-cell margin — and against our
+  **re-implementation**, not the authors' code (open-work #1).
+- **vs Hyperband / ASHA / BO (dominant HPO methods):** **not compared** — these are multi-fidelity /
+  proposal methods; our stopping rule is a *layer on top*, not a competitor. Untested (open-work #2).
+- **The genuine, defensible edge:** META **generalizes where fixed rules (incl. SOTA-style myopic
+  ones) fail** — across tasks, unseen model families, and unseen cost levels — a *robustness/transfer*
+  advantage, not a raw-speed one.
+
+**Honest headline:** *"Fixed cost-aware stopping rules (incl. 2025 SOTA) are myopic and
+benchmark-dependent; we offer a learned policy that transfers."* We have **not** shown "beats SOTA on
+every metric," and should not claim it; closing open-work #1–#2 is what would let us say "ahead" cleanly.
+
 ---
 
 ---

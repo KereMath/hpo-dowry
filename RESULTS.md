@@ -111,6 +111,17 @@ tasarruf, ≤%1.1 kayıp. **Düşmanca manzara (ölçeklenmemiş svc/breast_canc
 örnekten küçük tahmin → platoda erken duruyor). Ortalama (%53/%4.4) bu tek outlier'la zehirli;
 medyan temsili. → META'nın gerekçesinin canlı kanıtı; *hangi kural* manzaraya adapte olmalı (öğrenilmiş).
 
+## Dürüst rekabet-değerlendirmesi (neyi geçtik, neyi geçmedik)
+- **Sabit bütçe/patience (yaygın varsayılan):** net geçtik, %5–27, p<1e-6 — ama zayıf baseline.
+- **Xie 2025 PBGI (SOTA durdurma):** miyopik kuralımız GP-BO'da PBGI'ı GEÇMİYOR; META rank'te anlamlı
+  out-rank ediyor (Friedman p=4e-4) ama mütevazı büyüklük + Xie'nin gerçek kodu değil, re-implementasyon.
+- **Hyperband/ASHA/BO (dominant HPO):** KIYASLAMADIK — onlar multi-fidelity/proposal, biz üstüne katman.
+- **Asıl edge:** META, sabit kuralların (SOTA-tarzı miyopik dahil) çöktüğü yerde genelliyor (cross-family,
+  canlı svc/breast) — robustluk/transfer üstünlüğü, ham hız değil.
+- **Dürüst başlık:** "Sabit cost-aware durdurma (2025 SOTA dahil) miyopik+benchmark-bağımlı; biz transfer
+  eden öğrenilmiş politika sunuyoruz." "Her metrikte SOTA'yı ezdik" İDDİASI YOK. Temiz "geçtik" için
+  açık-iş #1–#2 (Xie gerçek kodu + Hyperband/BO baseline, standart benchmark) şart.
+
 ## Teori (THEORY.md)
 Thm1 Weitzman-optimallik (idealize); Prop2 4 varsayım ihlali (sonlu-ufuk→zaman-değişken eşik vb.);
 Prop4 **kanıtlı regret indirgemesi: regret ≤ L·⌈δ⌉** (δ=politikanın held-out tahmin hatası) → LOTO/
