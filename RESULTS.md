@@ -97,6 +97,18 @@ oluyor; META merkezi katkı.**
 → META görülmemiş maliyet seviyelerine + görülmemiş task'lara aynı anda genelliyor (+23–29%, p<1e-6).
 **Genelleme üçlemesi: task (LOTO) ✓ · model ailesi (LOFO) ✓ · maliyet (unseen-λ) ✓.**
 
+## Cross-family BO substrate (GP-BO/PBGI over rbv2 pools) — NULL, sınır koşulu
+LOTO/LOFO'da hem META hem MYOPIC ≈%0, anlamlı fark yok (p>0.04). Sebep: rbv2 (düşük-boyut) üzerinde
+GP-BO birkaç adımda yakınsıyor → incumbent + baseline + iki kural hemen platoluyor, durdurmaya
+headroom kalmıyor. Dürüst boundary: cost-aware durdurma **yavaş/pahalı aramada** (RS, derin-öğrenme
+LCBench: +%8–27) değer yaratır; BO'nun hızlı yakınsadığı yerde zararsız (~0) ama gereksiz.
+META yüksek-headroom rejiminde avantajlı. (THEORY.md §2: sonlu-ufuk + non-i.i.d. argümanı bunu öngörür.)
+
+## Teori (THEORY.md)
+Thm1 Weitzman-optimallik (idealize); Prop2 4 varsayım ihlali (sonlu-ufuk→zaman-değişken eşik vb.);
+Prop4 **kanıtlı regret indirgemesi: regret ≤ L·⌈δ⌉** (δ=politikanın held-out tahmin hatası) → LOTO/
+LOFO/unseen-λ genellemesini regret garantisine bağlıyor. Idealize Weitzman'ı geçme iddiası YOK.
+
 ## Artifaktlar
 PAPER.md (paper/tez taslağı + teori), optuna_plugin.py (ürün: ~%90 wall-clock tasarrufu, <%1 kayıp),
 rigor.py (Friedman/Nemenyi/figürler), unseen_lambda.py. Repo: github.com/KereMath/hpo-dowry.

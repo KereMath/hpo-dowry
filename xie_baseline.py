@@ -64,7 +64,8 @@ def _encode(cfgs, cs, num_names, cat_names, cat_maps):
     return X
 
 
-def sample_pool(scenario, instance, M=400, seed=0):
+def sample_pool(scenario, instance, M=400, seed=0,
+                score_key="val_accuracy", cost_key="time", score_div=100.0):
     b = _bench(scenario)
     b.set_instance(instance)
     cs = b.get_opt_space()
@@ -88,12 +89,16 @@ def sample_pool(scenario, instance, M=400, seed=0):
             num_names.append(hp.name)
     cfgs = []
     for _ in range(M):
-        d = cs.sample_configuration().get_dictionary()
+        d = cs.sample_configuration().get_dictionary()  # always valid (respects conditionals)
         d.update(fixed)
         cfgs.append(d)
     out = b.objective_function(cfgs)
-    s = np.array([o["val_accuracy"] / 100.0 for o in out])
-    c = np.array([max(o["time"], 1e-6) for o in out])
+    s = np.array([o[score_key] / score_div for o in out])
+    c = np.array([max(o[cost_key], 1e-6) for o in out])
+    # missing (inactive) features -> 0 before encoding
+    for d in cfgs:
+        for n in num_names + cat_names:
+            d.setdefault(n, 0)
     F = _encode(cfgs, cs, num_names, cat_names, cat_maps)
     return F, s, c
 
