@@ -104,6 +104,13 @@ headroom kalmıyor. Dürüst boundary: cost-aware durdurma **yavaş/pahalı aram
 LCBench: +%8–27) değer yaratır; BO'nun hızlı yakınsadığı yerde zararsız (~0) ama gereksiz.
 META yüksek-headroom rejiminde avantajlı. (THEORY.md §2: sonlu-ufuk + non-i.i.d. argümanı bunu öngörür.)
 
+## Gerçek-eğitim doğrulaması (surrogate değil; Optuna + EVTStopper, 3 model × 3 dataset)
+Medyan **%51 wall-clock tasarrufu, %0.56 doğruluk kaybı**. İyi-huylu manzaralar (RF/GB): %11–61
+tasarruf, ≤%1.1 kayıp. **Düşmanca manzara (ölçeklenmemiş svc/breast_cancer): %83 tasarruf ama
+%30.7 kayıp — sabit miyopik kuralın canlı felaketi** (nadir-iyi-config'li plato; EVT kuyruğu az
+örnekten küçük tahmin → platoda erken duruyor). Ortalama (%53/%4.4) bu tek outlier'la zehirli;
+medyan temsili. → META'nın gerekçesinin canlı kanıtı; *hangi kural* manzaraya adapte olmalı (öğrenilmiş).
+
 ## Teori (THEORY.md)
 Thm1 Weitzman-optimallik (idealize); Prop2 4 varsayım ihlali (sonlu-ufuk→zaman-değişken eşik vb.);
 Prop4 **kanıtlı regret indirgemesi: regret ≤ L·⌈δ⌉** (δ=politikanın held-out tahmin hatası) → LOTO/

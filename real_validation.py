@@ -49,7 +49,7 @@ def make_objective(model, X, y):
     return objective
 
 
-def run(model, ds_name, loader, budget=60, frac=0.02):
+def run(model, ds_name, loader, budget=30, frac=0.02):
     X, y = loader(return_X_y=True)
     obj = make_objective(model, X, y)
 

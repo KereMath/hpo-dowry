@@ -232,9 +232,20 @@ LCBench HPO where the TPE result was +8–27 %), and is simply *harmless* (≈ 0
 META) where BO already converges in a few steps. The learned policy's cross-family *advantage*
 manifests exactly in the high-headroom regime where stopping matters.
 
-**7.7 Product.** An Optuna `EVTStopper` drop-in callback auto-terminates a study; on
-RandomForest/digits it saves ~85–94 % wall-clock for ≤ 0.9 % accuracy, the single knob `frac`
-tracing the quality-vs-cost curve.
+**7.7 Live-training validation (no surrogate).** Running Optuna TPE with the myopic `EVTStopper`
+on *real* scikit-learn training (3 models × 3 datasets) gives a **median 51 % wall-clock saving for
+0.56 % accuracy lost** on benign landscapes (RandomForest, GradientBoosting: 11–61 % saved,
+≤ 1.1 % lost). But on an **adversarial landscape — unscaled SVC on breast_cancer, a low-value
+plateau with rare high-value configs — the fixed myopic rule stops catastrophically early in the
+plateau, losing 30.7 % accuracy.** This is a *live confirmation* of the family-dependence documented
+on rbv2: the fixed rule's EVT tail underestimates rare-good-config improvement from few early
+samples. It is precisely the failure that the meta-learned policy is designed to remove, and the
+strongest argument that *which* stopping rule one uses must adapt to the landscape — i.e., be
+learned. (Mean over all combos, 53 % / 4.4 %, is poisoned by the single SVC outlier; the median is
+the representative figure.)
+
+**7.8 Product.** An Optuna `EVTStopper` (and `MetaStopper`) drop-in callback auto-terminates a
+study; the single knob `frac` traces the quality-vs-cost curve.
 
 ---
 
